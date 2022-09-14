@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase test</title>
+</head>
+<body>
+    <div>
+    Upload Files<br />
+    <input type="file" id="files" multiple /><br /><br />
+    <button id="send">Upload</button>
+    <p id="uploading"></p>
+    <progress value="0" max="100" id="progress"></progress>
+    </div>
+    
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-app.js"></script>
+    
+    <!-- TODO: Add SDKs for Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-storage.js"></script>
+    
+    <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+        apiKey: "AIzaSyDF2DA14xdMuiGKzqU5iv4agnO42JObEK0",
+        authDomain: "unv-web.firebaseapp.com",
+        projectId: "unv-web",
+        storageBucket: "unv-web.appspot.com",
+        messagingSenderId: "799760566705",
+        appId: "1:799760566705:web:d5f69970eec90612d21590",
+        measurementId: "G-1THN3PK9XQ"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    
+    </script>
+    
+    <script>
+    var files = [];
+    document.getElementById("files").addEventListener("change", function(e) {
+      files = e.target.files;
+      for (let i = 0; i < files.length; i++) {
+        console.log(files[i]);
+      }
+    });
+    
+    document.getElementById("send").addEventListener("click", function() {
+      //checks if files are selected
+      if (files.length != 0) {
+        //Loops through all the selected files
+        for (let i = 0; i < files.length; i++) {
+          //create a storage reference
+          var storage = firebase.storage().ref(files[i].name);
+    
+          //upload file
+          var upload = storage.put(files[i]);
+    
+          //update progress bar
+          upload.on(
+            "state_changed",
+            function progress(snapshot) {
+              var percentage =
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              document.getElementById("progress").value = percentage;
+            },
+    
+            function error() {
+              alert("error uploading file");
+            },
+    
+            function complete() {
+              document.getElementById(
+                "uploading"
+              ).innerHTML += `${files[i].name} upoaded <br />`;
+            }
+          );
+        }
+      } else {
+        alert("No file chosen");
+      }
+    });
+    
+    function getFileUrl(filename) {
+      //create a storage reference
+      var storage = firebase.storage().ref(filename);
+    
+      //get file url
+      storage
+        .getDownloadURL()
+        .then(function(url) {
+          console.log(url);
+        })
+        .catch(function(error) {
+          console.log("error encountered");
+        });
+    }
+
+    
+    </script>
+    </body>
+</html>
